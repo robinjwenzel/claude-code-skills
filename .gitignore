@@ -1,0 +1,15 @@
+# Generierte Dateien
+slide_*.pptx
+LLE_Auszug_*.pdf
+output/
+
+# macOS
+.DS_Store
+
+# Temporaere Python-Dateien
+__pycache__/
+*.pyc
+
+# Editor
+*.swp
+*~
