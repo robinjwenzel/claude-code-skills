@@ -57,11 +57,12 @@ slide = prs.slides.add_slide(prs.slide_layouts[6])
 
 ### Typografie
 
-- **Schriftfamilie**: `"Segoe UI"` (Fallback: `"Arial"`)
-- **Folientitel**: 28pt, bold, Farbe Dunkelgrau. Einzelne Schluesselwoerter in Orange hervorheben (separater Run im gleichen Paragraph)
-- **Untertitel/Sektionsueberschriften**: 18-20pt, semi-bold, Dunkelgrau
-- **Fliesstext**: 14-16pt, regular, Dunkelgrau
-- **Kleintext/Labels**: 11-12pt, Dunkelgrau oder Mittelgrau
+- **Titel-Schriftart**: `"Calibri Light"` (Fallback: `"Arial"`) - fuer Folientitel und Sektionsueberschriften
+- **Body-Schriftart**: `"Calibri"` (Fallback: `"Arial"`) - fuer Fliesstext, Labels, Footer und alle sonstigen Texte
+- **Folientitel**: 28pt, bold, Farbe Dunkelgrau, Calibri Light. Einzelne Schluesselwoerter in Orange hervorheben (separater Run im gleichen Paragraph)
+- **Untertitel/Sektionsueberschriften**: 18-20pt, semi-bold, Dunkelgrau, Calibri Light
+- **Fliesstext**: 14-16pt, regular, Dunkelgrau, Calibri
+- **Kleintext/Labels/Footer**: 11-12pt, Dunkelgrau oder Mittelgrau, Calibri
 
 ### Hervorhebungen im Titel
 
@@ -76,14 +77,14 @@ run1.text = "Normaler Text "
 run1.font.size = Pt(28)
 run1.font.bold = True
 run1.font.color.rgb = RGBColor(0x56, 0x56, 0x56)
-run1.font.name = "Segoe UI"
+run1.font.name = "Calibri Light"
 
 run2 = p.add_run()
 run2.text = "Hervorgehobenes Wort"
 run2.font.size = Pt(28)
 run2.font.bold = True
 run2.font.color.rgb = RGBColor(0xEA, 0x5B, 0x0B)  # Orange
-run2.font.name = "Segoe UI"
+run2.font.name = "Calibri Light"
 ```
 
 ---
@@ -95,66 +96,30 @@ Jede Folie muss folgende Elemente enthalten:
 ### 1. Header-Bereich (oben)
 
 - **Titel**: Links oben, Position `(Inches(0.5), Inches(0.3))`, max. Breite 9 Zoll
-- **Logo**: Rechts oben - bestehend aus 4 kleinen Quadraten (2x2 Raster) in Orange/Gold plus dem Text "mindsquare"
+- **Logo**: Rechts oben als Bilddatei (echtes mindsquare-Logo)
 
-Logo-Aufbau:
+Logo einfuegen:
 ```python
-# Logo-Quadrate (2x2 Raster, oben rechts)
-logo_x = Inches(11.5)
-logo_y = Inches(0.35)
-size = Inches(0.15)
-gap = Inches(0.04)
+# Logo als Bild einfuegen
+import os
+logo_path = "/Users/robinwenzel/AI Playground/Claude Code/claude-code-skills/skills/slide/templates/logo_mindsquare.png"
+logo = slide.shapes.add_picture(logo_path, Inches(11.0), Inches(0.15), height=Inches(0.5))
+```
 
-# Oben links - Orange
-sq = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, logo_x, logo_y, size, size)
-sq.fill.solid(); sq.fill.fore_color.rgb = RGBColor(0xEA, 0x5B, 0x0B); sq.line.fill.background()
-
-# Oben rechts - Gold
-sq = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, logo_x + size + gap, logo_y, size, size)
-sq.fill.solid(); sq.fill.fore_color.rgb = RGBColor(0xFD, 0xC3, 0x00); sq.line.fill.background()
-
-# Unten links - Gold
-sq = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, logo_x, logo_y + size + gap, size, size)
-sq.fill.solid(); sq.fill.fore_color.rgb = RGBColor(0xFD, 0xC3, 0x00); sq.line.fill.background()
-
-# Unten rechts - Orange
-sq = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, logo_x + size + gap, logo_y + size + gap, size, size)
-sq.fill.solid(); sq.fill.fore_color.rgb = RGBColor(0xEA, 0x5B, 0x0B); sq.line.fill.background()
-
-# Logo-Text
-logo_text = slide.shapes.add_textbox(logo_x + 2 * size + 2 * gap + Inches(0.1), logo_y - Inches(0.03), Inches(1.5), Inches(0.4))
-tf = logo_text.text_frame
-p = tf.paragraphs[0]
-p.text = "mindsquare"
-p.font.size = Pt(18)
-p.font.bold = True
-p.font.color.rgb = RGBColor(0x56, 0x56, 0x56)
-p.font.name = "Segoe UI"
+Fuer dunkle Hintergruende (z.B. Trennfolien) die weisse Logo-Variante verwenden:
+```python
+logo_path_white = "/Users/robinwenzel/AI Playground/Claude Code/claude-code-skills/skills/slide/templates/logo_mindsquare_white.png"
+logo = slide.shapes.add_picture(logo_path_white, Inches(11.0), Inches(0.15), height=Inches(0.5))
 ```
 
 ### 2. Gradient-Linie unter dem Titel
 
-Da python-pptx keine echten Farbverlaeufe fuer Linien unterstuetzt, simuliere den Gradient mit mehreren schmalen Rechtecken:
+Die Gradient-Linie wird als Bilddatei eingefuegt (Orange-zu-Gold-Verlauf):
 
 ```python
-line_y = Inches(1.05)
-line_height = Pt(3)
-num_segments = 40
-total_width = Inches(12.333)
-seg_width = total_width / num_segments
-
-for i in range(num_segments):
-    ratio = i / (num_segments - 1)
-    r = int(0xEA + (0xFD - 0xEA) * ratio)
-    g = int(0x5B + (0xC3 - 0x5B) * ratio)
-    b = int(0x0B + (0x00 - 0x0B) * ratio)
-    seg = slide.shapes.add_shape(
-        MSO_SHAPE.RECTANGLE,
-        Inches(0.5) + int(seg_width * i), line_y, int(seg_width) + 1, line_height
-    )
-    seg.fill.solid()
-    seg.fill.fore_color.rgb = RGBColor(r, g, b)
-    seg.line.fill.background()
+# Gradient-Linie als Bild einfuegen
+line_path = "/Users/robinwenzel/AI Playground/Claude Code/claude-code-skills/skills/slide/templates/gradient_line.png"
+line_pic = slide.shapes.add_picture(line_path, Inches(0.2), Inches(0.84), Inches(12.87), Pt(3))
 ```
 
 ### 3. Content-Bereich
@@ -177,7 +142,7 @@ p = tf.paragraphs[0]
 p.text = "1"
 p.font.size = Pt(11)
 p.font.color.rgb = RGBColor(0x99, 0x99, 0x99)
-p.font.name = "Segoe UI"
+p.font.name = "Calibri"
 p.alignment = PP_ALIGN.RIGHT
 ```
 
@@ -222,13 +187,13 @@ p = tf.paragraphs[0]
 p.text = "Erste Zeile"
 p.font.size = Pt(14)
 p.font.color.rgb = RGBColor(0x56, 0x56, 0x56)
-p.font.name = "Segoe UI"
+p.font.name = "Calibri"
 
 p2 = tf.add_paragraph()
 p2.text = "Zweite Zeile"
 p2.font.size = Pt(12)
 p2.font.color.rgb = RGBColor(0x99, 0x99, 0x99)
-p2.font.name = "Segoe UI"
+p2.font.name = "Calibri"
 ```
 
 ### Rounded Rectangle mit Text
