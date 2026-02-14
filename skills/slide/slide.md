@@ -47,21 +47,23 @@ prs.slide_height = Inches(7.5)
 
 ### Farbpalette
 
+**WICHTIG: Verwende bevorzugt die folgenden CI-Farben. Andere Farben (z.B. Gruen, Blau) sind nur dann erlaubt, wenn sie visuell zur CI passen und sparsam eingesetzt werden. Im Regelfall genuegen die CI-Farben, um auch Kontraste wie "positiv vs. negativ" oder "Erwartung vs. Realitaet" darzustellen (z.B. Hellgrau/Weiss fuer neutral, Orange fuer Hervorhebungen/Warnungen).**
+
 | Farbe | RGB-Wert | Verwendung |
 |-------|----------|------------|
-| Orange | `RGBColor(0xEA, 0x5B, 0x0B)` | Primaerfarbe, Highlights, Akzente, Hervorhebungen im Titel |
+| Orange | `RGBColor(0xEA, 0x5B, 0x0B)` | Primaerfarbe, Highlights, Akzente, Hervorhebungen im Titel, Warnungen |
 | Gelb/Gold | `RGBColor(0xFD, 0xC3, 0x00)` | Sekundaerfarbe, Icons, Badges |
 | Dunkelgrau | `RGBColor(0x56, 0x56, 0x56)` | Fliesstext, Ueberschriften, Standardtextfarbe |
 | Hellgrau | `RGBColor(0xCC, 0xCC, 0xCC)` | Trennlinien, dezente Strukturen |
 | Hintergrund Hellgrau | `RGBColor(0xF5, 0xF5, 0xF5)` | Hintergrundelemente, Karten-Hintergrund |
-| Weiss | `RGBColor(0xFF, 0xFF, 0xFF)` | Folien-Hintergrund |
+| Weiss | `RGBColor(0xFF, 0xFF, 0xFF)` | Folien-Hintergrund, Text auf dunklen Flaechen |
 | Mittelgrau | `RGBColor(0x99, 0x99, 0x99)` | Kleintext, Labels, Footer |
 
 ### Typografie
 
 - **Titel-Schriftart**: `"Poppins"` (Bold) — fuer Folientitel, Sektionsueberschriften und grosse Labels
 - **Body-Schriftart**: `"Calibri"` (Fallback: `"Arial"`) — fuer Fliesstext, Labels, Footer und alle sonstigen Texte
-- **Folientitel**: 28pt, bold, Farbe Dunkelgrau, Poppins. Einzelne Schluesselwoerter in Orange hervorheben (separater Run im gleichen Paragraph)
+- **Folientitel**: 20pt, bold, Farbe Dunkelgrau, Poppins. Einzelne Schluesselwoerter in Orange hervorheben (separater Run im gleichen Paragraph). Der Titel muss EINZEILIG bleiben und OBERHALB der Gradient-Linie (Y=0.84 Zoll) passen. Die Titel-Textbox: Position Y=0.35, Hoehe 0.4 Zoll, Breite max. 10 Zoll. Bei sehr langen Titeln (>70 Zeichen) auf 18pt reduzieren.
 - **Sektionsueberschriften**: 16-20pt, Bold, Dunkelgrau, Poppins
 - **Timeline-Marker/grosse Labels**: 28pt, Bold, Poppins
 - **Fliesstext**: 14-16pt, regular, Dunkelgrau, Calibri
@@ -77,14 +79,14 @@ p = tf.paragraphs[0]
 
 run1 = p.add_run()
 run1.text = "Normaler Text "
-run1.font.size = Pt(28)
+run1.font.size = Pt(20)
 run1.font.bold = True
 run1.font.color.rgb = RGBColor(0x56, 0x56, 0x56)
 run1.font.name = "Poppins"
 
 run2 = p.add_run()
 run2.text = "Hervorgehobenes Wort"
-run2.font.size = Pt(28)
+run2.font.size = Pt(20)
 run2.font.bold = True
 run2.font.color.rgb = RGBColor(0xEA, 0x5B, 0x0B)  # Orange
 run2.font.name = "Poppins"
@@ -237,11 +239,12 @@ Die Praesentation soll aussehen, als waere sie von **McKinsey oder BCG** erstell
 2. **Strukturierte Darstellung**: Verwende Spalten-Layouts, Karten-Boxen (Rounded Rectangles), Prozessflows, Vergleichs-Layouts — NIEMALS reine Fliesstextbloecke
 3. **Sparsamer Farbeinsatz**: Hauptsaechlich Dunkelgrau (#565656) auf weissem Grund. Orange (#ea5b0b) NUR fuer Akzente, Highlights, wichtige Zahlen. Gold (#fdc300) nur als Sekundaerakzent
 4. **Folien-Hintergrund**: Standardmaessig Weiss. Fuer besondere Folien (z.B. Trennfolien) kann ein dunkler Hintergrund verwendet werden
-5. **Icons/Piktogramme**: Nutze Unicode-Symbole/Emojis wo passend (z.B. Buch-Emojis, Zahnrad, Rakete, Diagramm etc.)
+5. **Icons/Piktogramme**: Verwende KEINE Emojis/Unicode-Symbole. Nutze stattdessen native PowerPoint-Shapes (`MSO_SHAPE`) als professionelle Icons (siehe Abschnitt "Icon-System" weiter unten)
 6. **Datenorientiert**: Wo moeglich, konkrete Zahlen, Metriken, KPIs visuell hervorheben
 7. **Maximale Raumnutzung**: Der Content-Bereich soll gut gefuellt sein — keine grossen Leerflaechen
 8. **Konsistente Abstaende**: Einheitliches Spacing, saubere Ausrichtung
 9. **Karten/Boxen-Design**: Verwende `MSO_SHAPE.ROUNDED_RECTANGLE` mit `RGBColor(0xF5, 0xF5, 0xF5)` Hintergrund und `RGBColor(0xE0, 0xE0, 0xE0)` oder Orange Border fuer strukturierte Inhaltsboxen
+10. **Keine Ueberlappungen**: Shapes duerfen sich NIEMALS gegenseitig verdecken. Wenn Inhalte innerhalb einer Karte/Box platziert werden, muessen sie entweder Teil des Text-Frames der Karte sein ODER als separate Shapes mit Y-Koordinaten platziert werden, die unterhalb des vorherigen Elements liegen. Berechne Positionen explizit: `naechstes_element_y = vorheriges_element_y + vorheriges_element_hoehe + abstand`. Verwende NICHT gleichzeitig Text-Frame-Inhalte und ueberlagerte Shapes im selben Bereich.
 
 ## Folientypen und Layouts
 
@@ -255,6 +258,127 @@ Waehle je nach Inhalt das passende Layout:
 - **KPI-Dashboard**: Grosse Zahlen in Karten mit farblichen Akzenten
 - **Vergleich/Matrix**: Nebeneinander angeordnete Boxen mit Vergleichskategorien
 - **Trennfolie**: Zentrierter grosser Titel, minimalistisch
+
+## Icon-System (native PowerPoint-Shapes)
+
+**WICHTIG: Verwende NIEMALS Emojis oder Unicode-Symbole in Management-Praesentationen.** Stattdessen werden Icons aus nativen PowerPoint-Shapes (`MSO_SHAPE`) zusammengesetzt. Diese sehen professionell aus und lassen sich in den CI-Farben einfaerben.
+
+### Farbgebung von Icons
+
+Icons sollen sich **visuell vom Untergrund abheben** und mehrere CI-Farben kombinieren, um lebendig und professionell zu wirken. Verwende NICHT nur eine einzige Farbe pro Icon — kombiniere passende CI-Farben miteinander:
+
+- **Auf hellem Hintergrund (Weiss/Hellgrau)**: Primaerfarbe Orange oder Dunkelgrau, mit Gold oder der jeweils anderen Farbe als Akzent
+- **Auf orangefarbenem Hintergrund**: Weiss als Primaerfarbe, Gold als Akzent
+- **Auf dunklem Hintergrund**: Weiss als Primaerfarbe, Orange oder Gold als Akzent
+
+**Farbkombinationen fuer mehrteilige Icons:**
+- Bullseye/Zielscheibe: Aeusserer Ring Orange, innerer Ring Gold
+- Personen-Icons: Hauptperson Orange, Nebenpersonen Dunkelgrau
+- Balkendiagramm: Balken in Orange und Gold abwechselnd, oder aufsteigend von Dunkelgrau zu Orange
+- Zahnrad: Orange oder Gold (je nach Kontext)
+- Zusammengesetzte Icons: Verschiedene Teile in verschiedenen CI-Farben
+
+**Prinzip**: Nebeneinanderliegende Icons auf einer Folie sollten unterschiedliche Farbkombinationen verwenden, damit die Folie visuell abwechslungsreich wirkt
+
+### Icon-Katalog
+
+Verwende diese `MSO_SHAPE`-basierten Icons je nach Konzept:
+
+| Konzept | Shape(s) | Beispiel |
+|---------|----------|----------|
+| Ziel/Fokus | `OVAL` (3 konzentrisch, Donut-Prinzip) | Strategie, Zielsetzung |
+| Prozess/Betrieb | `GEAR_6` oder `GEAR_9` | Operative Umsetzung, Technik |
+| Geschwindigkeit | `LIGHTNING_BOLT` | Beschleunigung, Schnelligkeit |
+| Personen/Team | `OVAL` (Kopf) + `TRAPEZOID` (Koerper) | Mitarbeiter, Nutzer, Skalierung |
+| Wachstum/Chart | 3 `RECTANGLE` (verschieden hoch) | KPIs, Messung, Dashboard |
+| Warnung | `DIAMOND` mit `!`-Text | Risiko, Problem, Achtung |
+| Dokument/Plan | `FLOWCHART_DOCUMENT` | Planung, Dokumentation |
+| Richtung/Strategie | `PENTAGON` (Pfeilform) | Navigation, Strategie, Kompass |
+| Kreislauf/Iteration | `CIRCULAR_ARROW` | Iteration, Feedback, Kontinuitaet |
+| Trichter/Filter | `FUNNEL` | Filterung, Priorisierung |
+| Skalierung/Baustein | `CUBE` | Module, Bausteine |
+| Schritte/Flow | `CHEVRON` | Prozessschritte, Phasen |
+| Haekchen/Erfolg | `RECTANGLE` (Karte) + gruener Haken-Text | Erledigt, Best Practice |
+
+### Icon-Hilfsfunktion
+
+```python
+def draw_icon_target(slide, cx, cy, size, color):
+    """Zielscheibe/Bullseye aus konzentrischen Kreisen."""
+    s = size
+    for i, ratio in enumerate([1.0, 0.65, 0.3]):
+        r = s * ratio
+        circle = slide.shapes.add_shape(
+            MSO_SHAPE.OVAL,
+            int(cx - r/2), int(cy - r/2), int(r), int(r)
+        )
+        if i % 2 == 0:
+            circle.fill.solid()
+            circle.fill.fore_color.rgb = color
+        else:
+            circle.fill.solid()
+            circle.fill.fore_color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+        circle.line.fill.background()
+
+
+def draw_icon_person(slide, cx, cy, size, color):
+    """Einzelne Person (Kopf + Koerper)."""
+    head_r = int(size * 0.35)
+    head = slide.shapes.add_shape(
+        MSO_SHAPE.OVAL,
+        int(cx - head_r/2), int(cy - size * 0.5), head_r, head_r
+    )
+    head.fill.solid()
+    head.fill.fore_color.rgb = color
+    head.line.fill.background()
+    body_w = int(size * 0.6)
+    body_h = int(size * 0.45)
+    body = slide.shapes.add_shape(
+        MSO_SHAPE.TRAPEZOID,
+        int(cx - body_w/2), int(cy - size * 0.1), body_w, body_h
+    )
+    body.fill.solid()
+    body.fill.fore_color.rgb = color
+    body.line.fill.background()
+
+
+def draw_icon_chart(slide, cx, cy, size, color):
+    """Balkendiagramm aus 3 Rechtecken."""
+    bar_w = int(size * 0.2)
+    gap = int(size * 0.1)
+    heights = [0.4, 0.7, 1.0]
+    total_w = 3 * bar_w + 2 * gap
+    start_x = int(cx - total_w / 2)
+    for i, h_ratio in enumerate(heights):
+        bh = int(size * h_ratio)
+        bx = start_x + i * (bar_w + gap)
+        by = int(cy + size * 0.5 - bh)
+        bar = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, bx, by, bar_w, bh)
+        bar.fill.solid()
+        bar.fill.fore_color.rgb = color
+        bar.line.fill.background()
+
+
+def draw_icon_simple(slide, cx, cy, size, color, shape_type):
+    """Einzelnes MSO_SHAPE als Icon (z.B. GEAR_6, LIGHTNING_BOLT, etc.)."""
+    shape = slide.shapes.add_shape(
+        shape_type,
+        int(cx - size/2), int(cy - size/2), int(size), int(size)
+    )
+    shape.fill.solid()
+    shape.fill.fore_color.rgb = color
+    shape.line.fill.background()
+    return shape
+```
+
+### Platzierung von Icons
+
+- Icons typischerweise **0.4-0.6 Zoll** gross
+- In Karten-Headern: Links oder zentriert ueber dem Titel
+- In Spalten-Layouts: Zentriert ueber der Spalte
+- Immer mit ausreichend Abstand zum Text (mind. 0.1 Zoll)
+
+---
 
 ## Wichtige python-pptx Techniken
 
