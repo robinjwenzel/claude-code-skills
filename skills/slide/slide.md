@@ -1,7 +1,7 @@
 ---
+name: slide
 description: Erstellt eine professionelle Management-Praesentation als PowerPoint-Datei (.pptx) im mindsquare CI-Design
 allowed-tools: Write, Read, Edit, Bash
-argument-hint: Thema der Praesentation (z.B. 'SAP S/4HANA Migrationsstrategie fuer das Management')
 ---
 
 Erstelle eine professionelle Management-Praesentation mit mehreren Folien als PowerPoint-Datei (.pptx). Die Praesentation richtet sich an das Management und soll aussehen, als waere sie von einer renommierten Unternehmensberatung (McKinsey, BCG) erstellt worden.
