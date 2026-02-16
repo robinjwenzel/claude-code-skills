@@ -245,6 +245,7 @@ Die Praesentation soll aussehen, als waere sie von **McKinsey oder BCG** erstell
 8. **Konsistente Abstaende**: Einheitliches Spacing, saubere Ausrichtung
 9. **Karten/Boxen-Design**: Verwende `MSO_SHAPE.ROUNDED_RECTANGLE` mit `RGBColor(0xF5, 0xF5, 0xF5)` Hintergrund und `RGBColor(0xE0, 0xE0, 0xE0)` oder Orange Border fuer strukturierte Inhaltsboxen
 10. **Keine Ueberlappungen**: Shapes duerfen sich NIEMALS gegenseitig verdecken. Wenn Inhalte innerhalb einer Karte/Box platziert werden, muessen sie entweder Teil des Text-Frames der Karte sein ODER als separate Shapes mit Y-Koordinaten platziert werden, die unterhalb des vorherigen Elements liegen. Berechne Positionen explizit: `naechstes_element_y = vorheriges_element_y + vorheriges_element_hoehe + abstand`. Verwende NICHT gleichzeitig Text-Frame-Inhalte und ueberlagerte Shapes im selben Bereich.
+11. **Text immer zentriert in umgebenden Elementen**: Text muss immer symmetrisch und visuell zentriert innerhalb seiner Box/Karte dargestellt werden. Verwende `vertical_anchor = MSO_ANCHOR.MIDDLE` fuer vertikale Zentrierung. Siehe Abschnitt "Text in Shapes — Bekannte Probleme und Loesungen" fuer Details.
 
 ## Folientypen und Layouts
 
@@ -383,11 +384,15 @@ def draw_icon_simple(slide, cx, cy, size, color, shape_type):
 ## Wichtige python-pptx Techniken
 
 ### Textbox mit mehreren Absaetzen
+
+**WICHTIG**: Den ersten Inhalt IMMER direkt in `paragraphs[0]` schreiben. NIEMALS `paragraphs[0]` als leeren Spacer verwenden — das erzeugt eine sichtbare fuehrende Leerzeile.
+
 ```python
 txBox = slide.shapes.add_textbox(left, top, width, height)
 tf = txBox.text_frame
 tf.word_wrap = True
 
+# Ersten Inhalt direkt in paragraphs[0] — KEIN leerer Spacer!
 p = tf.paragraphs[0]
 p.text = "Erste Zeile"
 p.font.size = Pt(14)
@@ -402,7 +407,11 @@ p2.font.name = "Calibri"
 ```
 
 ### Rounded Rectangle mit Text
+
+**WICHTIG**: Fuer **kurze, einzeilige Texte** (z.B. Titel-Balken, Labels, Badges) kann der Text-Frame der Shape direkt verwendet werden. Fuer **mehrzeilige Inhalte oder Bullet-Listen** MUSS das Overlay-Pattern verwendet werden (siehe naechster Abschnitt).
+
 ```python
+# OK fuer kurze, einzeilige Texte (z.B. Header-Balken):
 shape = slide.shapes.add_shape(
     MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height
 )
@@ -413,11 +422,63 @@ shape.line.width = Pt(1)
 
 tf = shape.text_frame
 tf.word_wrap = True
+tf.vertical_anchor = MSO_ANCHOR.MIDDLE  # Immer vertikale Zentrierung setzen
 tf.margin_left = Inches(0.15)
 tf.margin_right = Inches(0.15)
 tf.margin_top = Inches(0.1)
 tf.margin_bottom = Inches(0.1)
 ```
+
+### Text in Shapes — Bekannte Probleme und Loesungen
+
+**KRITISCH: Bei Shape-Text-Frames (z.B. `ROUNDED_RECTANGLE`, `OVAL`) hat `paragraphs[0]` eine andere Default-Einrueckung als Absaetze, die mit `add_paragraph()` hinzugefuegt werden. Das fuehrt zu zwei haeufigen Darstellungsfehlern:**
+
+1. **Erster Bullet nach rechts verschoben**: Der erste Absatz (`paragraphs[0]`) einer Shape hat intern eine andere Einrueckung als nachfolgende Absaetze. Dadurch erscheint die erste Zeile nach rechts versetzt.
+2. **Fuehrende Leerzeile**: Wenn `paragraphs[0]` als leerer Spacer verwendet wird (z.B. `add_text_run(p, "", size=2)`), entsteht eine sichtbare Leerzeile am Anfang des Textblocks.
+
+**Loesung — Overlay-Pattern**: Fuer mehrzeilige Inhalte in Shapes (Bullet-Listen, Beschreibungstexte) verwende IMMER eine **separate Textbox**, die ueber die Shape gelegt wird. Die Shape dient nur als visueller Hintergrund/Rahmen, der Text kommt in die Textbox.
+
+```python
+# RICHTIG: Overlay-Pattern fuer mehrzeilige Inhalte in Karten/Boxen
+# 1. Shape als visuellen Rahmen erstellen (ohne Text)
+card = slide.shapes.add_shape(
+    MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height
+)
+card.fill.solid()
+card.fill.fore_color.rgb = RGBColor(0xF5, 0xF5, 0xF5)
+card.line.color.rgb = RGBColor(0xE0, 0xE0, 0xE0)
+card.line.width = Pt(1)
+
+# 2. Separate Textbox darueber legen (mit Inset fuer Padding)
+inset = Inches(0.15)
+txBox = slide.shapes.add_textbox(left + inset, top + inset, width - 2 * inset, height - 2 * inset)
+tf = txBox.text_frame
+tf.word_wrap = True
+tf.vertical_anchor = MSO_ANCHOR.MIDDLE  # Vertikale Zentrierung
+
+# 3. Ersten Absatz direkt in paragraphs[0] schreiben (KEIN leerer Spacer!)
+p = tf.paragraphs[0]
+run = p.add_run()
+run.text = "Erster Bullet-Punkt"
+# ... weitere Absaetze mit tf.add_paragraph()
+```
+
+```python
+# FALSCH: Text direkt in Shape-Text-Frame bei mehrzeiligen Inhalten
+shape = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height)
+tf = shape.text_frame
+p = tf.paragraphs[0]
+p.add_run().text = ""  # FALSCH: Erzeugt fuehrende Leerzeile
+p2 = tf.add_paragraph()  # FALSCH: Andere Einrueckung als paragraphs[0]
+p2.add_run().text = "Erster Punkt"
+```
+
+**Zusammenfassung der Regeln:**
+- **Einzeilige Texte** in Shapes (Labels, Titel-Balken): Text-Frame der Shape direkt verwenden, `vertical_anchor = MSO_ANCHOR.MIDDLE` setzen
+- **Mehrzeilige Texte/Bullet-Listen** in Shapes: Overlay-Pattern (Shape + separate Textbox)
+- **NIEMALS** `paragraphs[0]` als leeren Spacer verwenden (kein `add_text_run(p, "", size=2)`)
+- **IMMER** den ersten echten Inhalt direkt in `paragraphs[0]` schreiben
+- **IMMER** `vertical_anchor = MSO_ANCHOR.MIDDLE` setzen, wenn Text vertikal zentriert sein soll
 
 ### Pfeil-Shape
 ```python
