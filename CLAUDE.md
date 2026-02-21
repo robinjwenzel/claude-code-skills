@@ -37,3 +37,29 @@ skills/
 
 - **main** = stabiler Stand
 - **feature/<skill>-<feature>** = groessere Aenderungen
+
+## Skill-Design-Prinzipien
+
+### Progressive Disclosure
+
+Skill-Dateien (`<name>.md`) enthalten **nur Instruktionen** — kein Referenzmaterial.
+Referenzmaterial wird in `references/`, `scripts/` oder `assets/` ausgelagert und bei Bedarf per `Read` geladen.
+
+**Faustregel:**
+- *Beschreibt, wie etwas aussieht* (CSS, HTML-Snippets, Code, Tabellen) → externe Datei
+- *Schreibt vor, was Claude tun soll* (Qualitätsstandard, Workflow, Output-Spec) → im Skill
+
+**Was immer im Skill bleibt:**
+- Pfad zum Skill-Verzeichnis (damit Claude die Referenzdateien auflösen kann)
+- Qualitätsstandard / Acceptance Criteria ("kein generischer Platzhalter")
+- Output-Spezifikation (Dateinamen, Ablageort, was behalten / gelöscht wird)
+- Kritische Ausführungs-Instruktionen (z. B. "verbatim kopieren")
+
+**Empfohlene Verzeichnisstruktur:**
+```
+skills/<name>/
+├── <name>.md          # Instruktionen (≤ 1000 Zeichen anstreben)
+├── references/        # Tabellen, Vorlagen, Dokumentation
+├── scripts/           # Ausführbarer Code zum Einbetten
+└── assets/            # Bilder, Templates
+```
