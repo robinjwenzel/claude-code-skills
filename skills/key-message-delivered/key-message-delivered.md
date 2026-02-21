@@ -1,5 +1,5 @@
 ---
-name: Key Message Delivered
+name: key-message-delivered
 description: Erstellt strukturierte Verkaufsstorys und Management-Präsentationen nach Pyramiden-Prinzip und S-C-Q-Methodik für überzeugende Kundenkommunikation.
 allowed-tools: Read
 argument-hint: <Thema, Kunde oder Kontext der Präsentation>
