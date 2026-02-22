@@ -58,7 +58,7 @@ Referenzmaterial wird in `references/`, `scripts/` oder `assets/` ausgelagert un
 **Empfohlene Verzeichnisstruktur:**
 ```
 skills/<name>/
-├── <name>.md          # Instruktionen (≤ 1000 Zeichen anstreben)
+├── <name>.md          # Instruktionen (≤ 500 Zeilen anstreben)
 ├── references/        # Tabellen, Vorlagen, Dokumentation
 ├── scripts/           # Ausführbarer Code zum Einbetten
 └── assets/            # Bilder, Templates
