@@ -11,7 +11,7 @@ Skill-Verzeichnis: `/Users/robinwenzel/AI Playground/Claude Code/claude-code-ski
 Lies vor dem Start:
 - `references/ci.md` — Farbpalette, HTML-CSS-Skelett, Icon-System
 - `references/snippets.md` — Folientypen-Vorlagen, Praesentationsstruktur, Design-Regeln
-- `scripts/converter.py` — Python-Converter (Ausführungslogik ist bereits am Ende enthalten)
+- `scripts/converter.py` — Python-Converter (Ausfuehrungslogik ist bereits am Ende enthalten)
 
 ## Workflow
 
